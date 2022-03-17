@@ -1,5 +1,6 @@
-import React, { FC, useState } from 'react';
+import React, { FC, useState, useCallback } from 'react';
 import { Link } from 'react-router-dom';
+import axios from 'axios';
 
 import useInput from '../../hooks/useInput';
 import { Header, Form, Label, Input, Button, Error, Success, LinkContainer } from './style';
@@ -7,18 +8,56 @@ import { Header, Form, Label, Input, Button, Error, Success, LinkContainer } fro
 const SignUp: FC = () => {
   const [email, onChangeEmail] = useInput<string>('');
   const [nickname, onChangeNickname] = useInput<string>('');
-  const [password, onChangePassword] = useInput<string>('');
-  const [passwordCheck, onChangePasswordCheck] = useInput<string>('');
+  const [password, , setPassword] = useInput<string>('');
+  const [passwordCheck, , setPasswordCheck] = useInput<string>('');
 
-  const [mismatchError, setMismatchError] = useState<boolean>(false);
-  const [signUpError, setSignUpError] = useState<boolean>(false);
+  const [signUpError, setSignUpError] = useState<string>('');
   const [signUpSuccess, setSignUpSuccess] = useState<boolean>(false);
+  const [mismatchError, setMismatchError] = useState<boolean>(false);
 
-  const onSubmit = () => {};
+  const onChangePassword = useCallback(
+    (e) => {
+      setPassword(e.target.value);
+      passwordCheck && setMismatchError(e.target.value !== passwordCheck);
+    },
+    [passwordCheck]
+  );
+
+  const onChangePasswordCheck = useCallback(
+    (e) => {
+      setPasswordCheck(e.target.value);
+      setMismatchError(e.target.value !== password);
+    },
+    [password]
+  );
+
+  const onSubmit = useCallback(
+    async (e) => {
+      e.preventDefault();
+
+      if (nickname && !mismatchError) {
+        try {
+          setSignUpError('');
+          setSignUpSuccess(false);
+
+          await axios.post('/api/users', { email, nickname, password });
+
+          confirm('회원가입이 완료되었습니다.');
+          setSignUpSuccess(true);
+        } catch (e: any) {
+          setSignUpError(e.response.data);
+          console.log(e.message);
+        } finally {
+          setSignUpError('');
+        }
+      }
+    },
+    [email, nickname, password, mismatchError]
+  );
 
   return (
     <div id='container'>
-      <Header>Sleact</Header>
+      <Header>mySlack</Header>
       <Form onSubmit={onSubmit}>
         <Label id='email-label'>
           <span>이메일 주소</span>
@@ -52,7 +91,7 @@ const SignUp: FC = () => {
           {mismatchError && <Error>비밀번호가 일치하지 않습니다.</Error>}
           {!nickname && <Error>닉네임을 입력해 주세요.</Error>}
           {signUpError && <Error>{signUpError}</Error>}
-          {signUpSuccess && <Success>회원가입 되었습니다! 로그인해 주세요.</Success>}
+          {signUpSuccess && <Success>회원가입이 완료되었습니다. 로그인 해주세요.</Success>}
         </Label>
         <Button type='submit'>회원가입</Button>
       </Form>
