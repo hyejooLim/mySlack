@@ -47,8 +47,6 @@ const SignUp: FC = () => {
         } catch (e: any) {
           setSignUpError(e.response.data);
           console.log(e.message);
-        } finally {
-          setSignUpError('');
         }
       }
     },
