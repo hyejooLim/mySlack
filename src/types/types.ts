@@ -1,3 +1,8 @@
+export type ParamType = {
+  workspace: string;
+  channel: string;
+};
+
 export interface IUser {
   id: number;
   nickname: string;
