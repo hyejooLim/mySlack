@@ -19,7 +19,7 @@ const config: webpack.Configuration = {
     //   '@layouts': path.resolve(__dirname, 'src/layouts'),
     //   '@pages': path.resolve(__dirname, 'src/pages'),
     //   '@utils': path.resolve(__dirname, 'src/utils'),
-    //   '@typings': path.resolve(__dirname, 'src/typings'),
+    //   '@types': path.resolve(__dirname, 'src/types'),
     // },
   },
   entry: {

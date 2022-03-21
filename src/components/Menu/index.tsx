@@ -5,7 +5,7 @@ import { CreateMenu, CloseModalButton } from './style';
 interface MenuProps {
   style: CSSProperties;
   showModal: boolean;
-  onCloseModal: () => void;
+  onCloseModal: (e: any) => void;
 }
 
 const Menu: FC<MenuProps> = (props) => {
