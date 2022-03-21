@@ -6,9 +6,10 @@ import useSWR from 'swr';
 import useInput from '../../hooks/useInput';
 import fetcher from '../../utils/fetcher';
 import { Header, Form, Label, Input, Button, LinkContainer, Error } from '../SignUp/style';
+import { IUser } from '../../types/types';
 
 const LogIn = () => {
-  const { data, error, isValidating, mutate } = useSWR('/api/users', fetcher, {
+  const { data, mutate } = useSWR<IUser | false>('/api/users', fetcher, {
     dedupingInterval: 100000,
   });
 
@@ -42,7 +43,7 @@ const LogIn = () => {
   }
 
   if (data) {
-    return <Navigate to={'/workspace/channel'} />;
+    return <Navigate to={'/workspace/sleact/channel/일반'} />;
   }
 
   return (
