@@ -35,12 +35,12 @@ const InviteToChannelModal: FC<InviteToChannelModalProps> = (props) => {
       if (!memberEmail || !memberEmail.trim()) return;
 
       try {
-        const response = await axios.post(
+        await axios.post(
           `/api/workspaces/${workspace}/channels/${channel}/members`,
           { email: memberEmail },
           { withCredentials: true }
         );
-        mutate(response.data, false);
+        mutate();
         setShowModal(false);
         setMemberEmail('');
       } catch (e: any) {
