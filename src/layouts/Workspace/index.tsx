@@ -27,6 +27,8 @@ import CreateChannelModal from '../../components/CreateChannelModal';
 import CreateWorkspaceModal from '../../components/CreateWorkspaceModal';
 import InviteToWorkspaceModal from '../../components/InviteToWorkspaceModal';
 import InviteToChannelModal from '../../components/InviteToChannelModal';
+import ChannelList from '../../components/ChannelList';
+import DMList from '../../components/DMList';
 
 const Workspace: FC = ({ children }) => {
   const [showUserProfileModal, setShowUserProfileModal] = useState<boolean>(false);
@@ -36,9 +38,9 @@ const Workspace: FC = ({ children }) => {
   const [showInviteToWorkspaceModal, setShowInviteToWorkspaceModal] = useState<boolean>(false);
   const [showInviteToChannelModal, setShowInviteToChannelModal] = useState<boolean>(false);
 
-  const { workspace, channel } = useParams<ParamType>();
+  const { workspace } = useParams<ParamType>();
 
-  const { data: userData, mutate } = useSWR<IUser | false>('/api/users', fetcher);
+  const { data: userData, mutate } = useSWR<IUser | false>('/api/users', fetcher, { dedupingInterval: 2000 });
   const { data: channelData } = useSWR<IChannel[]>(userData ? `/api/workspaces/${workspace}/channels` : null, fetcher);
 
   const onLogOut = useCallback(async () => {
@@ -144,9 +146,6 @@ const Workspace: FC = ({ children }) => {
             {userData.Workspaces.find((ws) => ws.url === workspace)?.name}
           </WorkspaceName>
           <MenuScroll>
-            {channelData?.map((channel) => (
-              <div key={channel.id}>{channel.name}</div>
-            ))}
             {showWorkspaceModal && (
               <Menu style={{ top: 100, left: 80 }} showModal={showWorkspaceModal} onCloseModal={onToggleWorkspaceModal}>
                 <WorkspaceModal>
@@ -157,6 +156,8 @@ const Workspace: FC = ({ children }) => {
                 </WorkspaceModal>
               </Menu>
             )}
+            <ChannelList />
+            <DMList />
           </MenuScroll>
         </Channels>
         <Chats>{children}</Chats>
