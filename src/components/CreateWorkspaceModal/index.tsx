@@ -18,7 +18,7 @@ interface CreateWorkspaceModalProps {
 const CreateWorkspaceModal: FC<CreateWorkspaceModalProps> = (props) => {
   const [newWorkspace, onChangeNewWorkspace, setNewWorkspace] = useInput<string>('');
   const [newUrl, onChangeNewUrl, setNewUrl] = useInput<string>('');
-  const { data: userData, mutate } = useSWR<IUser | false>('/api/users', fetcher);
+  const { data: userData, mutate } = useSWR<IUser | false>('/api/users', fetcher, { dedupingInterval: 2000 });
 
   const { showModal, setShowModal, onCloseModal } = props;
 

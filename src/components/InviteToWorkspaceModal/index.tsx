@@ -20,7 +20,7 @@ const InviteToWorkspaceModal: FC<InviteToWorkspaceModalProps> = (props) => {
   const [memberEmail, onChangeMemberEmail, setMemberEmail] = useInput<string>('');
   const { workspace } = useParams<ParamType>();
 
-  const { data: userData } = useSWR<IUser>('/api/users', fetcher);
+  const { data: userData } = useSWR<IUser>('/api/users', fetcher, { dedupingInterval: 2000 });
   const { data: MemberData, mutate } = useSWR<IUser[]>(
     userData ? `/api/workspaces/${workspace}/members` : null,
     fetcher

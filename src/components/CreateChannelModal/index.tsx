@@ -8,7 +8,7 @@ import fetcher from '../../utils/fetcher';
 import Modal from '../Modal';
 import useInput from '../../hooks/useInput';
 import { Label, Input, Button } from '../../pages/SignUp/style';
-import { ParamType, IChannel } from '../../types/types';
+import { IUser, ParamType, IChannel } from '../../types/types';
 
 interface CreateChannelModalProps {
   showModal: boolean;
@@ -20,7 +20,11 @@ const CreateChannelModal: FC<CreateChannelModalProps> = (props) => {
   const [newChannel, onChangeNewChannel, setNewChannel] = useInput<string>('');
 
   const { workspace, channel } = useParams<ParamType>();
-  const { data: channelData, mutate } = useSWR<IChannel[]>(`/api/workspaces/${workspace}/channels`, fetcher);
+  const { data: userData } = useSWR<IUser>('/api/users', fetcher, { dedupingInterval: 2000 });
+  const { data: channelData, mutate } = useSWR<IChannel[]>(
+    userData ? `/api/workspaces/${workspace}/channels` : null,
+    fetcher
+  );
 
   const { showModal, setShowModal, onCloseModal } = props;
 
