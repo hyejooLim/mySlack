@@ -30,7 +30,7 @@ export interface IChannel {
 }
 
 // 채널의 채팅
-export interface IChat {
+export interface IChannelChat {
   id: number;
   UserId: number;
   User: IUser; // 보낸 사람
@@ -41,7 +41,7 @@ export interface IChat {
 }
 
 // DM 채팅
-export interface IDM {
+export interface IDMChat {
   id: number;
   SenderId: number; // 보낸 사람 아이디
   Sender: IUser;
