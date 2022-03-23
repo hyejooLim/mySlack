@@ -1,19 +1,50 @@
-import React, { useCallback } from 'react';
-import useInput from '../../hooks/useInput';
+import React, { FC, FormEventHandler, useCallback } from 'react';
+import { useParams } from 'react-router-dom';
+import { Mention } from 'react-mentions';
+import useSWR from 'swr';
 
 import { ChatBoxZone, Form, MentionsTextarea, SendButton, Toolbox } from './style';
+import fetcher from '../../utils/fetcher';
+import { IUser, ParamType } from '../../types/types';
 
-const ChatBox = () => {
-  const [chat, onChangeChat, setChat] = useInput<string>('');
+interface ChatBoxProps {
+  chat: string;
+  onChange: (e: any) => void;
+  onSubmit: FormEventHandler<HTMLFormElement>;
+  placeholder?: string;
+}
 
-  const onSubmitChat = useCallback((e) => {
-    e.preventDafault();
-  }, []);
+const ChatBox: FC<ChatBoxProps> = (props) => {
+  const { workspace } = useParams<ParamType>();
+  const { data: userData } = useSWR<IUser>('/api/users', fetcher, { dedupingInterval: 2000 });
+  const { data: memberData } = useSWR<IUser[]>(userData ? `/api/workspaces/${workspace}/members` : null, fetcher);
+
+  const { chat, onChange, onSubmit, placeholder } = props;
+
+  const onKeyDownChat = useCallback(
+    (e) => {
+      if (e.key === 'Enter' && !e.shiftKey) {
+        onSubmit(e);
+      }
+    },
+    [onSubmit]
+  );
 
   return (
     <ChatBoxZone>
-      <Form onSubmit={onSubmitChat}>
-        <MentionsTextarea></MentionsTextarea>
+      <Form onSubmit={onSubmit}>
+        <MentionsTextarea
+          id='editor-chat'
+          value={chat}
+          onChange={onChange}
+          placeholder={placeholder}
+          onKeyDown={onKeyDownChat}
+        >
+          <Mention
+            trigger='@'
+            data={memberData?.map((member) => ({ id: member.id, display: member.nickname })) || []}
+          />
+        </MentionsTextarea>
         <Toolbox>
           <SendButton
             className={

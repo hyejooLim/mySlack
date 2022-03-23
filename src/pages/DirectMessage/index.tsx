@@ -1,18 +1,40 @@
-import React from 'react';
+import React, { useCallback } from 'react';
 import { useParams } from 'react-router-dom';
 import useSWR from 'swr';
 import gravatar from 'gravatar';
+import axios from 'axios';
 
 import { DragOver, Container, Header } from './style';
 import Workspace from '../../layouts/Workspace';
-import { IUser, ParamType } from '../../types/types';
+import { IDM, IUser, ParamType } from '../../types/types';
 import fetcher from '../../utils/fetcher';
 import ChatList from '../../components/ChatList';
 import ChatBox from '../../components/ChatBox';
+import useInput from '../../hooks/useInput';
 
 const DirectMessage = () => {
+  const [chat, onChangeChat, setChat] = useInput<string>('');
+
   const { workspace, id } = useParams<ParamType>();
-  const { data: memberData } = useSWR<IUser>(`/api/workspaces/${workspace}/users/${id}`, fetcher);
+  const { data: userData } = useSWR<IUser>('/api/users', fetcher, { dedupingInterval: 2000 });
+  const { data: memberData } = useSWR<IUser>(userData ? `/api/workspaces/${workspace}/users/${id}` : null, fetcher);
+  const { data: chatData } = useSWR<IDM>(userData ? `/api/workspaces/${workspace}/dms/${id}/chats` : null, fetcher);
+
+  const onSubmitChat = useCallback(
+    async (e: any) => {
+      e.preventDefault();
+
+      if (!chat.trim()) return;
+
+      try {
+        await axios.post(`/api/workspaces/${workspace}/dms/${id}/chats`, { content: chat }, { withCredentials: true });
+        setChat('');
+      } catch (e: any) {
+        console.log(e.message);
+      }
+    },
+    [chat]
+  );
 
   if (memberData === undefined) {
     return null;
@@ -26,7 +48,7 @@ const DirectMessage = () => {
           <span>{memberData.nickname}</span>
         </Header>
         <ChatList />
-        <ChatBox />
+        <ChatBox chat={chat} onChange={onChangeChat} onSubmit={onSubmitChat} />
       </Container>
     </Workspace>
   );
