@@ -28,7 +28,7 @@ const LogIn = () => {
           await axios.post('/api/users/login', { email, password }, { withCredentials: true });
           mutate();
 
-          confirm('로그인 되었습니다.');
+          alert('로그인 되었습니다.');
         } catch (e: any) {
           setLogInError(e.response.data);
           console.log(e.message);
