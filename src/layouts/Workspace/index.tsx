@@ -1,4 +1,4 @@
-import React, { FC, useCallback, useState } from 'react';
+import React, { FC, useCallback, useEffect, useState } from 'react';
 import { Navigate, Link, useParams } from 'react-router-dom';
 import useSWR from 'swr';
 import axios from 'axios';
@@ -29,6 +29,7 @@ import InviteToWorkspaceModal from '../../components/InviteToWorkspaceModal';
 import InviteToChannelModal from '../../components/InviteToChannelModal';
 import ChannelList from '../../components/ChannelList';
 import DMList from '../../components/DMList';
+import useSocket from '../../hooks/useSocket';
 
 const Workspace: FC = ({ children }) => {
   const [showUserProfileModal, setShowUserProfileModal] = useState<boolean>(false);
@@ -40,8 +41,23 @@ const Workspace: FC = ({ children }) => {
 
   const { workspace } = useParams<ParamType>();
 
-  const { data: userData, mutate } = useSWR<IUser | false>('/api/users', fetcher, { dedupingInterval: 2000 });
+  const { data: userData, mutate } = useSWR<IUser>('/api/users', fetcher, { dedupingInterval: 2000 });
   const { data: channelData } = useSWR<IChannel[]>(userData ? `/api/workspaces/${workspace}/channels` : null, fetcher);
+  const [socket, disconnect] = useSocket(workspace);
+
+  useEffect(() => {
+    if (userData && channelData && socket) {
+      console.log(socket);
+
+      socket.emit('login', { id: userData.id, channels: channelData.map((channel) => channel.id) });
+    }
+  }, [userData, channelData, socket]);
+
+  useEffect(() => {
+    return () => {
+      disconnect();
+    };
+  }, [workspace, disconnect]);
 
   const onLogOut = useCallback(async () => {
     try {

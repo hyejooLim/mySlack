@@ -1,6 +1,7 @@
-import React, { FC, useCallback, useState } from 'react';
+import React, { FC, useCallback, useEffect, useState } from 'react';
 import { useParams, NavLink } from 'react-router-dom';
 import useSWR from 'swr';
+import useSocket from '../../hooks/useSocket';
 
 import { IUser, ParamType } from '../../types/types';
 import fetcher from '../../utils/fetcher';
@@ -13,6 +14,19 @@ const DMList: FC = () => {
   const { workspace, id } = useParams<ParamType>();
   const { data: userData } = useSWR<IUser>('/api/users', fetcher, { dedupingInterval: 2000 });
   const { data: memberData } = useSWR<IUser[]>(userData ? `/api/workspaces/${workspace}/members` : null, fetcher);
+  const [socket] = useSocket(workspace);
+
+  useEffect(() => {
+    if (socket) {
+      socket.on('onlineList', (onlineList: number[]) => {
+        setOnlineList(onlineList);
+      });
+    }
+
+    return () => {
+      socket?.off('onlineList');
+    };
+  }, [socket]);
 
   const toggleMemberCollapse = useCallback(() => {
     setMemberCollapse((prev) => !prev);
