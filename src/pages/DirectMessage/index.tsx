@@ -6,7 +6,7 @@ import axios from 'axios';
 
 import { DragOver, Container, Header } from './style';
 import Workspace from '../../layouts/Workspace';
-import { IDM, IUser, ParamType } from '../../types/types';
+import { IDMChat, IUser, ParamType } from '../../types/types';
 import fetcher from '../../utils/fetcher';
 import ChatList from '../../components/ChatList';
 import ChatBox from '../../components/ChatBox';
@@ -18,7 +18,10 @@ const DirectMessage = () => {
   const { workspace, id } = useParams<ParamType>();
   const { data: userData } = useSWR<IUser>('/api/users', fetcher, { dedupingInterval: 2000 });
   const { data: memberData } = useSWR<IUser>(userData ? `/api/workspaces/${workspace}/users/${id}` : null, fetcher);
-  const { data: chatData } = useSWR<IDM>(userData ? `/api/workspaces/${workspace}/dms/${id}/chats` : null, fetcher);
+  const { data: chatData } = useSWR<IDMChat[]>(
+    userData ? `/api/workspaces/${workspace}/dms/${id}/chats?perPage=20&page=1` : null,
+    fetcher
+  );
 
   const onSubmitChat = useCallback(
     async (e: any) => {
@@ -47,7 +50,7 @@ const DirectMessage = () => {
           <img src={gravatar.url(memberData.email, { s: '28px', d: 'retro' })} alt={memberData.nickname} />
           <span>{memberData.nickname}</span>
         </Header>
-        <ChatList />
+        <ChatList chatData={chatData}/>
         <ChatBox chat={chat} onChange={onChangeChat} onSubmit={onSubmitChat} />
       </Container>
     </Workspace>
