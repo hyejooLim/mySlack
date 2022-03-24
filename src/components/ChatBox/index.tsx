@@ -24,10 +24,13 @@ const ChatBox: FC<ChatBoxProps> = (props) => {
 
   const { chat, onChange, onSubmit, placeholder } = props;
 
-  const onKeyDownChat = useCallback(
+  const onKeyPress = useCallback(
     (e) => {
-      if (e.key === 'Enter' && !e.shiftKey) {
-        onSubmit(e);
+      if (e.key === 'Enter') {
+        if (!e.shiftKey) {
+          e.preventDefault();
+          onSubmit(e);
+        }
       }
     },
     [onSubmit]
@@ -64,8 +67,8 @@ const ChatBox: FC<ChatBoxProps> = (props) => {
           value={chat}
           onChange={onChange}
           placeholder={placeholder}
-          onKeyDown={onKeyDownChat}
-          // inputRef={mentionRef}
+          onKeyPress={onKeyPress}
+          inputRef={mentionRef}
           allowSuggestionsAboveCursor
         >
           <Mention
