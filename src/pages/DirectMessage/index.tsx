@@ -11,6 +11,7 @@ import fetcher from '../../utils/fetcher';
 import ChatList from '../../components/ChatList';
 import ChatBox from '../../components/ChatBox';
 import useInput from '../../hooks/useInput';
+import makeSections from '../../utils/makeSections';
 
 const DirectMessage = () => {
   const [chat, onChangeChat, setChat] = useInput<string>('');
@@ -19,7 +20,7 @@ const DirectMessage = () => {
   const { data: userData } = useSWR<IUser>('/api/users', fetcher, { dedupingInterval: 2000 });
   const { data: memberData } = useSWR<IUser>(userData ? `/api/workspaces/${workspace}/users/${id}` : null, fetcher);
   const { data: chatData } = useSWR<IDMChat[]>(
-    userData ? `/api/workspaces/${workspace}/dms/${id}/chats?perPage=20&page=1` : null,
+    `/api/workspaces/${workspace}/dms/${id}/chats?perPage=20&page=1`,
     fetcher
   );
 
@@ -39,6 +40,8 @@ const DirectMessage = () => {
     [chat]
   );
 
+  const chatSections = makeSections(chatData ? [...chatData].reverse() : []);
+
   if (memberData === undefined) {
     return null;
   }
@@ -50,7 +53,7 @@ const DirectMessage = () => {
           <img src={gravatar.url(memberData.email, { s: '28px', d: 'retro' })} alt={memberData.nickname} />
           <span>{memberData.nickname}</span>
         </Header>
-        <ChatList chatData={chatData}/>
+        <ChatList chatSections={chatSections} />
         <ChatBox chat={chat} onChange={onChangeChat} onSubmit={onSubmitChat} />
       </Container>
     </Workspace>

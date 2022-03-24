@@ -1,15 +1,15 @@
 import React, { FC, useCallback, useRef } from 'react';
 import { Scrollbars } from 'react-custom-scrollbars-2';
 
-import { IChannelChat, IDMChat } from '../../types/types';
-import { ChatListZone } from './style';
+import { IDMChat } from '../../types/types';
+import { ChatListZone, Section, StickyHeader } from './style';
 import Chat from '../Chat';
 
 interface ChatListProps {
-  chatData?: IDMChat[] | IChannelChat[];
+  chatSections: { [key: string]: IDMChat[] };
 }
 
-const ChatList: FC<ChatListProps> = ({ chatData }) => {
+const ChatList: FC<ChatListProps> = ({ chatSections }) => {
   const scrollbarRef = useRef<Scrollbars>(null);
 
   // 스크롤바를 최상단으로 올렸을 때 과거 채팅 로딩
@@ -18,8 +18,15 @@ const ChatList: FC<ChatListProps> = ({ chatData }) => {
   return (
     <ChatListZone>
       <Scrollbars ref={scrollbarRef} onScrollFrame={onScroll}>
-        {chatData?.map((chat) => (
-          <Chat key={chat.id} data={chat} />
+        {Object.entries(chatSections).map(([date, chats]) => (
+          <Section key={date} className={`section-${date}`}>
+            <StickyHeader>
+              <button>{date}</button>
+            </StickyHeader>
+            {chats?.map((chat) => (
+              <Chat key={chat.id} data={chat} />
+            ))}
+          </Section>
         ))}
       </Scrollbars>
     </ChatListZone>
