@@ -19,7 +19,7 @@ const DirectMessage = () => {
   const { workspace, id } = useParams<ParamType>();
   const { data: userData } = useSWR<IUser>('/api/users', fetcher, { dedupingInterval: 2000 });
   const { data: memberData } = useSWR<IUser>(userData ? `/api/workspaces/${workspace}/users/${id}` : null, fetcher);
-  const { data: chatData } = useSWR<IDMChat[]>(
+  const { data: chatData, mutate } = useSWR<IDMChat[]>(
     `/api/workspaces/${workspace}/dms/${id}/chats?perPage=20&page=1`,
     fetcher
   );
@@ -32,12 +32,13 @@ const DirectMessage = () => {
 
       try {
         await axios.post(`/api/workspaces/${workspace}/dms/${id}/chats`, { content: chat }, { withCredentials: true });
+        mutate();
         setChat('');
       } catch (e: any) {
         console.log(e.message);
       }
     },
-    [chat]
+    [chat, workspace, id]
   );
 
   const chatSections = makeSections(chatData ? [...chatData].reverse() : []);
