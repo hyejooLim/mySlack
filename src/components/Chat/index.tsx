@@ -1,17 +1,42 @@
-import React, { FC } from 'react';
+import React, { FC, useMemo, memo } from 'react';
+import { Link, useParams } from 'react-router-dom';
 import gravatar from 'gravatar';
 import dayjs from 'dayjs';
+import regexifyString from 'regexify-string';
 
-import { IChannelChat, IDMChat } from '../../types/types';
+import { IChannelChat, IDMChat, ParamType } from '../../types/types';
 import { ChatWrapper } from './style';
 
 interface ChatProps {
   data: IDMChat | IChannelChat;
 }
 
-const Chat: FC<ChatProps> = (props) => {
-  const { data } = props;
+const Chat: FC<ChatProps> = ({ data }) => {
+  const { workspace } = useParams<ParamType>();
+
   const user = 'Sender' in data ? data.Sender : data.User;
+
+  const content = useMemo(
+    () =>
+      regexifyString({
+        input: data.content,
+        pattern: /\@\[(.+)\]\((\d+)\)|\n/g,
+        decorator(match, index) {
+          const arr = match.match(/\@\[(.+)\]\((\d+)\)/);
+
+          if (arr) {
+            return (
+              <Link key={match + index} to={`/workspace/${workspace}/dm/${arr[2]}`}>
+                @{arr[1]}
+              </Link>
+            );
+          }
+
+          return <br key={index} />;
+        },
+      }),
+    [data.content]
+  );
 
   return (
     <ChatWrapper>
@@ -23,10 +48,10 @@ const Chat: FC<ChatProps> = (props) => {
           <b>{user.nickname}</b>
           <span>{dayjs(data.createdAt).format('h:mm A')}</span>
         </div>
-        <p>{data.content}</p>
+        <p>{content}</p>
       </div>
     </ChatWrapper>
   );
 };
 
-export default Chat;
+export default memo(Chat);

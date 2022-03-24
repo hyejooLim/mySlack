@@ -64,7 +64,7 @@ export const SendButton = styled.button`
   top: 5px;
 `;
 
-export const EachMention = styled.button<{ focus: boolean }>`
+export const EachMention = styled.button<{ focused: boolean }>`
   padding: 4px 20px;
   background: transparent;
   border: none;
@@ -76,8 +76,9 @@ export const EachMention = styled.button<{ focus: boolean }>`
   & img {
     margin-right: 5px;
   }
-  ${({ focus }) =>
-    focus &&
+
+  ${({ focused }) =>
+    focused &&
     `
     background: #1264a3;
     color: white;
