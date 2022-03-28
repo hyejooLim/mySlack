@@ -30,7 +30,7 @@ const DirectMessage = () => {
     fetcher
   );
   const isEmpty = chatData?.[0].length === 0;
-  const isRichingEnd = isEmpty || (chatData && chatData[chatData.length - 1].length < 20) || false;
+  const isReachingEnd = isEmpty || (chatData && chatData[chatData.length - 1].length < 20) || false;
   const scrollbarRef = useRef<Scrollbars>(null);
 
   useEffect(() => {
@@ -71,7 +71,7 @@ const DirectMessage = () => {
           <img src={gravatar.url(memberData.email, { s: '28px', d: 'retro' })} alt={memberData.nickname} />
           <span>{memberData.nickname}</span>
         </Header>
-        <ChatList chatSections={chatSections} ref={scrollbarRef} setSize={setSize} isRichingEnd={isRichingEnd} />
+        <ChatList chatSections={chatSections} ref={scrollbarRef} setSize={setSize} isReachingEnd={isReachingEnd} />
         <ChatBox chat={chat} onChange={onChangeChat} onSubmit={onSubmitChat} />
       </Container>
     </Workspace>

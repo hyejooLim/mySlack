@@ -8,16 +8,16 @@ import Chat from '../Chat';
 interface ChatListProps {
   chatSections: { [key: string]: IDMChat[] };
   setSize: (size: number | ((_size: number) => number)) => Promise<IDMChat[][] | undefined>;
-  isRichingEnd: boolean;
+  isReachingEnd: boolean;
 }
 
 const ChatList = forwardRef<Scrollbars, ChatListProps>((props, scrollbarRef) => {
-  const { chatSections, setSize, isRichingEnd } = props;
+  const { chatSections, setSize, isReachingEnd } = props;
 
   // 스크롤바를 최상단으로 올렸을 때 과거 채팅 로딩
   const onScroll = useCallback(
     (values) => {
-      if (values.scrollTop === 0 && !isRichingEnd) {
+      if (values.scrollTop === 0 && !isReachingEnd) {
         setSize((prevSize) => prevSize + 1).then(() => {
           const current = (scrollbarRef as MutableRefObject<Scrollbars>)?.current;
           // 스크롤바 위치 유지
@@ -27,7 +27,7 @@ const ChatList = forwardRef<Scrollbars, ChatListProps>((props, scrollbarRef) => 
         });
       }
     },
-    [isRichingEnd, setSize, scrollbarRef]
+    [isReachingEnd, setSize, scrollbarRef]
   );
 
   return (
