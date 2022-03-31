@@ -37,7 +37,6 @@ const Workspace: FC = ({ children }) => {
   const [showWorkspaceModal, setShowWorkspaceModal] = useState<boolean>(false);
   const [showCreateChannelModal, setShowCreateChannelModal] = useState<boolean>(false);
   const [showInviteToWorkspaceModal, setShowInviteToWorkspaceModal] = useState<boolean>(false);
-  const [showInviteToChannelModal, setShowInviteToChannelModal] = useState<boolean>(false);
 
   const { workspace } = useParams<ParamType>();
 
@@ -47,8 +46,6 @@ const Workspace: FC = ({ children }) => {
 
   useEffect(() => {
     if (userData && channelData && socket) {
-      console.log(socket);
-
       socket.emit('login', { id: userData.id, channels: channelData.map((channel) => channel.id) });
     }
   }, [userData, channelData, socket]);
@@ -104,10 +101,6 @@ const Workspace: FC = ({ children }) => {
 
   const onCloseInviteToWorkspaceModal = useCallback(() => {
     setShowInviteToWorkspaceModal(false);
-  }, []);
-
-  const onCloseInviteToChannelModal = useCallback(() => {
-    setShowInviteToChannelModal(false);
   }, []);
 
   if (!userData) {
@@ -190,13 +183,6 @@ const Workspace: FC = ({ children }) => {
           showModal={showInviteToWorkspaceModal}
           setShowModal={setShowInviteToWorkspaceModal}
           onCloseModal={onCloseInviteToWorkspaceModal}
-        />
-      )}
-      {showInviteToChannelModal && (
-        <InviteToChannelModal
-          showModal={showInviteToChannelModal}
-          setShowModal={setShowInviteToChannelModal}
-          onCloseModal={onCloseInviteToChannelModal}
         />
       )}
     </div>
