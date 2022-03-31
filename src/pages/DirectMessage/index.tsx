@@ -106,7 +106,7 @@ const DirectMessage = () => {
           <span>{memberData.nickname}</span>
         </Header>
         <ChatList chatSections={chatSections} ref={scrollbarRef} setSize={setSize} isReachingEnd={isReachingEnd} />
-        <ChatBox chat={chat} onChange={onChangeChat} onSubmit={onSubmitChat} />
+        <ChatBox chat={chat} onChange={onChangeChat} onSubmit={onSubmitChat} placeholder='메시지를 입력하세요.' />
       </Container>
     </Workspace>
   );
