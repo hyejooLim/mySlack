@@ -36,23 +36,9 @@ const DirectMessage = () => {
   const isReachingEnd = isEmpty || (chatData && chatData[chatData.length - 1].length < 20) || false;
   const scrollbarRef = useRef<Scrollbars>(null);
 
-  useEffect(() => {
-    socket?.on('dm', onMessage);
-
-    return () => {
-      socket?.off('dm', onMessage);
-    };
-  }, [socket]);
-
-  useEffect(() => {
-    if (chatData?.length === 1) {
-      scrollbarRef.current?.scrollToBottom();
-    }
-  }, [chatData, scrollbarRef.current]);
-
-  const onMessage = useCallback(
+  const onDM = useCallback(
     (data: IDMChat) => {
-      // 채팅하는 상대 
+      // 채팅 상대
       if (data.SenderId === Number(id)) {
         mutate((chatData) => {
           chatData?.[0].unshift(data);
@@ -71,6 +57,20 @@ const DirectMessage = () => {
     },
     [id, scrollbarRef.current]
   );
+
+  useEffect(() => {
+    socket?.on('dm', onDM);
+
+    return () => {
+      socket?.off('dm', onDM);
+    };
+  }, [socket, onDM]);
+
+  useEffect(() => {
+    if (chatData?.length === 1) {
+      scrollbarRef.current?.scrollToBottom();
+    }
+  }, [chatData, scrollbarRef.current]);
 
   const onSubmitChat = useCallback(
     async (e: any) => {
