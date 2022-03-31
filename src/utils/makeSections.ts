@@ -1,8 +1,11 @@
+import { IChannelChat } from './../types/types';
 import dayjs from 'dayjs';
 import { IDMChat } from '../types/types';
 
-export default function makeSections(chatData: IDMChat[]) {
-  const sections: { [key: string]: IDMChat[] } = {};
+export type ChatType = IDMChat | IChannelChat;
+
+export default function makeSections(chatData: ChatType[]) {
+  const sections: { [key: string]: ChatType[] } = {};
 
   chatData.forEach((chat) => {
     const date = dayjs(chat.createdAt).format('YYYY-MM-DD');

@@ -1,13 +1,14 @@
 import React, { forwardRef, MutableRefObject, useCallback } from 'react';
 import { Scrollbars } from 'react-custom-scrollbars-2';
 
-import { IDMChat } from '../../types/types';
+import { IChannelChat, IDMChat } from '../../types/types';
 import { ChatListZone, Section, StickyHeader } from './style';
+import { ChatType } from '../../utils/makeSections';
 import Chat from '../Chat';
 
 interface ChatListProps {
-  chatSections: { [key: string]: IDMChat[] };
-  setSize: (size: number | ((_size: number) => number)) => Promise<IDMChat[][] | undefined>;
+  chatSections: { [key: string]: ChatType[] };
+  setSize: (size: number | ((_size: number) => number)) => Promise<ChatType[][] | undefined>;
   isReachingEnd: boolean;
 }
 
