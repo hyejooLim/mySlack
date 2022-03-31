@@ -17,11 +17,9 @@ const DMList: FC = () => {
   const [socket] = useSocket(workspace);
 
   useEffect(() => {
-    if (socket) {
-      socket.on('onlineList', (onlineList: number[]) => {
-        setOnlineList(onlineList);
-      });
-    }
+    socket?.on('onlineList', (onlineList: number[]) => {
+      setOnlineList(onlineList);
+    });
 
     return () => {
       socket?.off('onlineList');
