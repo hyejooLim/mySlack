@@ -19,6 +19,7 @@ const useSocket = (workspace: string | undefined): ReturnType => {
     return [undefined, disconnect];
   }
 
+  // 초기에만 서버와 연결
   if (!sockets[workspace]) {
     sockets[workspace] = io.connect(`${BACK_URL}/ws-${workspace}`, {
       transports: ['websocket'],
