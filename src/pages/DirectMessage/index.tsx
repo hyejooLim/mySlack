@@ -14,6 +14,7 @@ import ChatList from '../../components/ChatList';
 import ChatBox from '../../components/ChatBox';
 import useInput from '../../hooks/useInput';
 import makeSections from '../../utils/makeSections';
+import useSocket from '../../hooks/useSocket';
 
 const DirectMessage = () => {
   const [chat, onChangeChat, setChat] = useInput<string>('');
@@ -29,16 +30,47 @@ const DirectMessage = () => {
     (index) => `/api/workspaces/${workspace}/dms/${id}/chats?perPage=20&page=${index + 1}`,
     fetcher
   );
+  const [socket] = useSocket(workspace);
+
   const isEmpty = chatData?.[0].length === 0;
   const isReachingEnd = isEmpty || (chatData && chatData[chatData.length - 1].length < 20) || false;
   const scrollbarRef = useRef<Scrollbars>(null);
 
   useEffect(() => {
+    socket?.on('dm', onMessage);
+
+    return () => {
+      socket?.off('dm', onMessage);
+    };
+  }, [socket]);
+
+  useEffect(() => {
     if (chatData?.length === 1) {
       scrollbarRef.current?.scrollToBottom();
     }
-    console.log(chatData);
-  }, [chatData]);
+  }, [chatData, scrollbarRef.current]);
+
+  const onMessage = useCallback(
+    (data: IDMChat) => {
+      // 채팅하는 상대 
+      if (data.SenderId === Number(id)) {
+        mutate((chatData) => {
+          chatData?.[0].unshift(data);
+          return chatData;
+        }, false).then(() => {
+          if (scrollbarRef.current) {
+            if (
+              scrollbarRef.current.getScrollHeight() <
+              scrollbarRef.current.getClientHeight() + scrollbarRef.current.getScrollTop() + 200
+            ) {
+              scrollbarRef.current.scrollToBottom();
+            }
+          }
+        });
+      }
+    },
+    [id, scrollbarRef.current]
+  );
 
   const onSubmitChat = useCallback(
     async (e: any) => {
@@ -50,7 +82,9 @@ const DirectMessage = () => {
         await axios.post(`/api/workspaces/${workspace}/dms/${id}/chats`, { content: chat }, { withCredentials: true });
         mutate();
         setChat('');
-        scrollbarRef.current?.scrollToBottom();
+        setTimeout(() => {
+          scrollbarRef.current?.scrollToBottom();
+        }, 50);
       } catch (e: any) {
         console.log(e.message);
       }
