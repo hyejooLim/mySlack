@@ -21,7 +21,7 @@ const Channel = () => {
   const [showInviteToChannelModal, setShowInviteToChannelModal] = useState<boolean>(false);
   const [dragOver, setDragOver] = useState<boolean>(false);
 
-  const { workspace, channel } = useParams<ParamType>();
+  const { workspace, channel, id } = useParams<ParamType>();
   const { data: userData } = useSWR<IUser>('/api/users', fetcher, { dedupingInterval: 2000 });
   const { data: channelMemberData } = useSWR<IUser[]>(
     userData ? `/api/workspaces/${workspace}/channels/${channel}/members` : null,
@@ -40,6 +40,10 @@ const Channel = () => {
   const isEmpty = chatData?.[0].length === 0;
   const isReachingEnd = isEmpty || (chatData && chatData[chatData.length - 1].length < 20) || false;
   const scrollbarRef = useRef<Scrollbars>(null);
+
+  useEffect(() => {
+    scrollbarRef.current?.scrollToBottom();
+  }, []);
 
   const onMessage = useCallback(
     (data: IChannelChat) => {
@@ -71,10 +75,8 @@ const Channel = () => {
   }, [socket, onMessage]);
 
   useEffect(() => {
-    if (chatData?.length === 1) {
-      scrollbarRef.current?.scrollToBottom();
-    }
-  }, [chatData, scrollbarRef.current]);
+    localStorage.setItem(`${workspace}-${channel}`, new Date().getTime().toString());
+  }, [workspace, channel]);
 
   const onSubmitChat = useCallback(
     async (e: any) => {
@@ -88,6 +90,7 @@ const Channel = () => {
           { content: chat },
           { withCredentials: true }
         );
+        localStorage.setItem(`${workspace}-${channel}`, new Date().getTime().toString());
         mutate();
         setChat('');
         setTimeout(() => {
@@ -132,6 +135,7 @@ const Channel = () => {
       }
 
       axios.post(`/api/workspaces/${workspace}/channels/${channel}/images`, formData).then(() => {
+        localStorage.setItem(`${workspace}-${channel}`, new Date().getTime().toString());
         mutate();
         setDragOver(false);
         setTimeout(() => {

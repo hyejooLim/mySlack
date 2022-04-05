@@ -1,10 +1,11 @@
 import React, { FC, useCallback, useState } from 'react';
-import { useParams, NavLink } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import useSWR from 'swr';
 
 import { IUser, IChannel, ParamType } from '../../types/types';
 import fetcher from '../../utils/fetcher';
 import { CollapseButton } from './style';
+import EachChannel from '../EachChannel';
 
 const ChannelList: FC = () => {
   const [channelCollapse, setChannelCollapse] = useState<boolean>(false);
@@ -31,18 +32,9 @@ const ChannelList: FC = () => {
       </h2>
       <div>
         {!channelCollapse &&
-          channelData?.map((ch) => {
-            const isActive = ch.name === channel;
-
-            return (
-              <NavLink
-                key={ch.id}
-                className={isActive ? 'selected' : ''}
-                to={`/workspace/${workspace}/channel/${ch.name}`}
-              >
-                <span># {ch.name}</span>
-              </NavLink>
-            );
+          channelData?.map((eachChannel) => {
+            const isActive = eachChannel.name === channel;
+            return <EachChannel key={eachChannel.id} isActive={isActive} channel={eachChannel} />;
           })}
       </div>
     </>
