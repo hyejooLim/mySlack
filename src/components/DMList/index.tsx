@@ -1,11 +1,12 @@
 import React, { FC, useCallback, useEffect, useState } from 'react';
-import { useParams, NavLink } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import useSWR from 'swr';
 import useSocket from '../../hooks/useSocket';
 
 import { IUser, ParamType } from '../../types/types';
 import fetcher from '../../utils/fetcher';
 import { CollapseButton } from '../ChannelList/style';
+import EachDM from '../EachDM';
 
 const DMList: FC = () => {
   const [memberCollapse, setMemberCollapse] = useState<boolean>(false);
@@ -46,28 +47,9 @@ const DMList: FC = () => {
         {!memberCollapse &&
           memberData?.map((member) => {
             const isActive = member.id === Number(id);
-            const isOnline = onlineList.find((item) => item === member.id);
+            const isOnline = onlineList.includes(member.id);
 
-            return (
-              <NavLink
-                key={member.id}
-                className={isActive ? 'selected' : ''}
-                to={`/workspace/${workspace}/dm/${member.id}`}
-              >
-                <i
-                  className={`c-icon p-channel_sidebar__presence_icon p-channel_sidebar__presence_icon--dim_enabled c-presence ${
-                    isOnline ? 'c-presence--active c-icon--presence-online' : 'c-icon--presence-offline'
-                  }`}
-                  aria-hidden='true'
-                  data-qa='presence_indicator'
-                  data-qa-presence-self='false'
-                  data-qa-presence-active='false'
-                  data-qa-presence-dnd='false'
-                />
-                <span>{member.nickname}</span>
-                {member.id === userData?.id ? <span> (나)</span> : null}
-              </NavLink>
-            );
+            return <EachDM key={member.id} member={member} isActive={isActive} isOnline={isOnline} />;
           })}
       </div>
     </>

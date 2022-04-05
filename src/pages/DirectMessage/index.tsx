@@ -37,6 +37,12 @@ const DirectMessage = () => {
   const isReachingEnd = isEmpty || (chatData && chatData[chatData.length - 1].length < 20) || false;
   const scrollbarRef = useRef<Scrollbars>(null);
 
+  useEffect(() => {
+    setTimeout(() => {
+      scrollbarRef.current?.scrollToBottom();
+    }, 50);
+  }, [scrollbarRef.current]);
+
   const onDM = useCallback(
     (data: IDMChat) => {
       // 채팅 상대
@@ -68,10 +74,8 @@ const DirectMessage = () => {
   }, [socket, onDM]);
 
   useEffect(() => {
-    if (chatData?.length === 1) {
-      scrollbarRef.current?.scrollToBottom();
-    }
-  }, [chatData, scrollbarRef.current]);
+    localStorage.setItem(`${workspace}-${id}`, new Date().getTime().toString());
+  }, [workspace, id]);
 
   const onSubmitChat = useCallback(
     async (e: any) => {
@@ -81,6 +85,7 @@ const DirectMessage = () => {
 
       try {
         await axios.post(`/api/workspaces/${workspace}/dms/${id}/chats`, { content: chat }, { withCredentials: true });
+        localStorage.setItem(`${workspace}-${id}`, new Date().getTime().toString());
         mutate();
         setChat('');
         setTimeout(() => {
@@ -117,6 +122,7 @@ const DirectMessage = () => {
       }
 
       axios.post(`/api/workspaces/${workspace}/dms/${id}/images`, formData).then(() => {
+        localStorage.setItem(`${workspace}-${id}`, new Date().getTime().toString());
         mutate();
         setDragOver(false);
         setTimeout(() => {
