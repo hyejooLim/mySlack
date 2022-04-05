@@ -1,5 +1,5 @@
-import React, { FC, useEffect } from 'react';
-import { useParams, NavLink, useLocation } from 'react-router-dom';
+import React, { FC } from 'react';
+import { useParams, NavLink } from 'react-router-dom';
 import useSWR from 'swr';
 
 import { IChannel, IUser, ParamType } from '../../types/types';
@@ -19,14 +19,6 @@ const EachChannel: FC<EachChannelProps> = ({ channel, isActive }) => {
     userData ? `/api/workspaces/${workspace}/channels/${channel.name}/unreads?after=${date}` : null,
     fetcher
   );
-
-  const location = useLocation();
-
-  useEffect(() => {
-    if (decodeURI(location.pathname) === `/workspace/${workspace}/channel/${channel.name}`) {
-      mutate(0);
-    }
-  }, [location.pathname, workspace, channel, mutate]);
 
   return (
     <NavLink

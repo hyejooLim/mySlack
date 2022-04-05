@@ -1,5 +1,5 @@
-import React, { FC, useEffect } from 'react';
-import { useParams, NavLink, useLocation } from 'react-router-dom';
+import React, { FC } from 'react';
+import { useParams, NavLink } from 'react-router-dom';
 import useSWR from 'swr';
 
 import { IUser, ParamType } from '../../types/types';
@@ -20,14 +20,6 @@ const EachDM: FC<EachDMProps> = ({ member, isActive, isOnline }) => {
     userData ? `/api/workspaces/${workspace}/dms/${member.id}/unreads?after=${date}` : null,
     fetcher
   );
-
-  const location = useLocation();
-  
-  useEffect(() => {
-    if (decodeURI(location.pathname) === `/workspace/${workspace}/dms/${member.id}`) {
-      mutate(0);
-    }
-  }, [location.pathname, workspace, member, mutate]);
 
   return (
     <NavLink key={member.id} className={isActive ? 'selected' : ''} to={`/workspace/${workspace}/dm/${member.id}`}>
