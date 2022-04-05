@@ -5,6 +5,8 @@ import gravatar from 'gravatar';
 import axios from 'axios';
 import { Scrollbars } from 'react-custom-scrollbars-2';
 import useSWRInfinite from 'swr/infinite';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 import { DragOver, Container, Header } from './style';
 import Workspace from '../../layouts/Workspace';
@@ -57,6 +59,14 @@ const DirectMessage = () => {
               scrollbarRef.current.getClientHeight() + scrollbarRef.current.getScrollTop() + 200
             ) {
               scrollbarRef.current.scrollToBottom();
+            } else {
+              toast.success('새 메시지가 도착했습니다.', {
+                autoClose: 3000,
+                position: toast.POSITION.BOTTOM_LEFT,
+                onClick() {
+                  scrollbarRef.current?.scrollToBottom();
+                },
+              });
             }
           }
         });
@@ -149,6 +159,7 @@ const DirectMessage = () => {
         <ChatList chatSections={chatSections} ref={scrollbarRef} setSize={setSize} isReachingEnd={isReachingEnd} />
         <ChatBox chat={chat} onChange={onChangeChat} onSubmit={onSubmitChat} placeholder='메시지를 입력하세요.' />
         {dragOver && <DragOver>Uploading...</DragOver>}
+        <ToastContainer />
       </Container>
     </Workspace>
   );

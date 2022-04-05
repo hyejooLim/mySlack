@@ -4,6 +4,8 @@ import useSWRInfinite from 'swr/infinite';
 import useSWR from 'swr';
 import Scrollbars from 'react-custom-scrollbars-2';
 import axios from 'axios';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 import { DragOver, Container, Header } from './style';
 import Workspace from '../../layouts/Workspace';
@@ -42,8 +44,10 @@ const Channel = () => {
   const scrollbarRef = useRef<Scrollbars>(null);
 
   useEffect(() => {
-    scrollbarRef.current?.scrollToBottom();
-  }, []);
+    setTimeout(() => {
+      scrollbarRef.current?.scrollToBottom();
+    }, 50);
+  }, [scrollbarRef.current]);
 
   const onMessage = useCallback(
     (data: IChannelChat) => {
@@ -58,6 +62,14 @@ const Channel = () => {
               scrollbarRef.current.getClientHeight() + scrollbarRef.current.getScrollTop() + 200
             ) {
               scrollbarRef.current.scrollToBottom();
+            } else {
+              toast.success('새 메시지가 도착했습니다.', {
+                autoClose: 3000,
+                position: toast.POSITION.BOTTOM_LEFT,
+                onClick() {
+                  scrollbarRef.current?.scrollToBottom();
+                },
+              });
             }
           }
         });
@@ -176,6 +188,7 @@ const Channel = () => {
           />
         )}
         {dragOver && <DragOver>Uploading...</DragOver>}
+        <ToastContainer />
       </Container>
     </Workspace>
   );
