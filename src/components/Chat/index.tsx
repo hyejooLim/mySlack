@@ -31,7 +31,11 @@ const Chat: FC<ChatProps> = ({ data }) => {
 
             if (arr) {
               return (
-                <Link key={match + index} to={`/workspace/${workspace}/dm/${arr[2]}`}>
+                <Link
+                  key={match + index}
+                  to={`/workspace/${workspace}/dm/${arr[2]}`}
+                  style={{ textDecoration: 'none', color: '#006FFF' }}
+                >
                   @{arr[1]}
                 </Link>
               );
