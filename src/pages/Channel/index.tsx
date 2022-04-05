@@ -52,6 +52,8 @@ const Channel = () => {
   const onMessage = useCallback(
     (data: IChannelChat) => {
       if (data.Channel.name === channel) {
+        localStorage.setItem(`${workspace}-${channel}`, new Date().getTime().toString());
+        
         mutate((chatData) => {
           chatData?.[0].unshift(data);
           return chatData;
@@ -75,7 +77,7 @@ const Channel = () => {
         });
       }
     },
-    [channel, scrollbarRef.current]
+    [channel, workspace, scrollbarRef.current]
   );
 
   useEffect(() => {

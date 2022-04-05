@@ -49,6 +49,8 @@ const DirectMessage = () => {
     (data: IDMChat) => {
       // 채팅 상대
       if (data.SenderId === Number(id)) {
+        localStorage.setItem(`${workspace}-${id}`, new Date().getTime().toString());
+        
         mutate((chatData) => {
           chatData?.[0].unshift(data);
           return chatData;
@@ -72,7 +74,7 @@ const DirectMessage = () => {
         });
       }
     },
-    [id, scrollbarRef.current]
+    [id, workspace, scrollbarRef.current]
   );
 
   useEffect(() => {
