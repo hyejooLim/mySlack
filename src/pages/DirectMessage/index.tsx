@@ -1,4 +1,4 @@
-import React, { useRef, useCallback, useEffect } from 'react';
+import React, { useState, useRef, useCallback, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import useSWR from 'swr';
 import gravatar from 'gravatar';
@@ -18,6 +18,7 @@ import useSocket from '../../hooks/useSocket';
 
 const DirectMessage = () => {
   const [chat, onChangeChat, setChat] = useInput<string>('');
+  const [dragOver, setDragOver] = useState<boolean>(false);
 
   const { workspace, id } = useParams<ParamType>();
   const { data: userData } = useSWR<IUser>('/api/users', fetcher, { dedupingInterval: 2000 });
@@ -92,6 +93,40 @@ const DirectMessage = () => {
     [chat, workspace, id, scrollbarRef.current]
   );
 
+  const onDragOver = useCallback((e) => {
+    e.preventDefault();
+    setDragOver(true);
+  }, []);
+
+  const onDrop = useCallback(
+    (e) => {
+      e.preventDefault();
+
+      const formData = new FormData();
+      if (e.dataTransfer.items) {
+        for (let i = 0; i < e.dataTransfer.items.length; i++) {
+          if (e.dataTransfer.items[i].kind === 'file') {
+            let file = e.dataTransfer.items[i].getAsFile();
+            formData.append('image', file);
+          }
+        }
+      } else {
+        for (let i = 0; i < e.dataTransfer.files.length; i++) {
+          formData.append('image', e.dataTransfer.files[i]);
+        }
+      }
+
+      axios.post(`/api/workspaces/${workspace}/dms/${id}/images`, formData).then(() => {
+        mutate();
+        setDragOver(false);
+        setTimeout(() => {
+          scrollbarRef.current?.scrollToBottom();
+        }, 50);
+      });
+    },
+    [workspace, id, scrollbarRef.current]
+  );
+
   const chatSections = makeSections(chatData ? [...chatData].flat().reverse() : []);
 
   if (memberData === undefined) {
@@ -100,13 +135,14 @@ const DirectMessage = () => {
 
   return (
     <Workspace>
-      <Container>
+      <Container onDragOver={onDragOver} onDrop={onDrop}>
         <Header>
           <img src={gravatar.url(memberData.email, { s: '28px', d: 'retro' })} alt={memberData.nickname} />
           <span>{memberData.nickname}</span>
         </Header>
         <ChatList chatSections={chatSections} ref={scrollbarRef} setSize={setSize} isReachingEnd={isReachingEnd} />
         <ChatBox chat={chat} onChange={onChangeChat} onSubmit={onSubmitChat} placeholder='메시지를 입력하세요.' />
+        {dragOver && <DragOver>Uploading...</DragOver>}
       </Container>
     </Workspace>
   );

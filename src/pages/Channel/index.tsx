@@ -19,6 +19,7 @@ import useSocket from '../../hooks/useSocket';
 const Channel = () => {
   const [chat, onChangeChat, setChat] = useInput<string>('');
   const [showInviteToChannelModal, setShowInviteToChannelModal] = useState<boolean>(false);
+  const [dragOver, setDragOver] = useState<boolean>(false);
 
   const { workspace, channel } = useParams<ParamType>();
   const { data: userData } = useSWR<IUser>('/api/users', fetcher, { dedupingInterval: 2000 });
@@ -61,6 +62,20 @@ const Channel = () => {
     [channel, scrollbarRef.current]
   );
 
+  useEffect(() => {
+    socket?.on('message', onMessage);
+
+    return () => {
+      socket?.off('message', onMessage);
+    };
+  }, [socket, onMessage]);
+
+  useEffect(() => {
+    if (chatData?.length === 1) {
+      scrollbarRef.current?.scrollToBottom();
+    }
+  }, [chatData, scrollbarRef.current]);
+
   const onSubmitChat = useCallback(
     async (e: any) => {
       e.preventDefault();
@@ -85,20 +100,6 @@ const Channel = () => {
     [chat, workspace, channel, scrollbarRef.current]
   );
 
-  useEffect(() => {
-    socket?.on('message', onMessage);
-
-    return () => {
-      socket?.off('message', onMessage);
-    };
-  }, [socket, onMessage]);
-
-  useEffect(() => {
-    if (chatData?.length === 1) {
-      scrollbarRef.current?.scrollToBottom();
-    }
-  }, [chatData, scrollbarRef.current]);
-
   const onClickInviteToChannel = useCallback(() => {
     setShowInviteToChannelModal(true);
   }, []);
@@ -107,11 +108,45 @@ const Channel = () => {
     setShowInviteToChannelModal(false);
   }, []);
 
+  const onDragOver = useCallback((e) => {
+    e.preventDefault();
+    setDragOver(true);
+  }, []);
+
+  const onDrop = useCallback(
+    (e) => {
+      e.preventDefault();
+
+      const formData = new FormData();
+      if (e.dataTransfer.items) {
+        for (let i = 0; i < e.dataTransfer.items.length; i++) {
+          if (e.dataTransfer.items[i].kind === 'file') {
+            let file = e.dataTransfer.items[i].getAsFile();
+            formData.append('image', file);
+          }
+        }
+      } else {
+        for (let i = 0; i < e.dataTransfer.files.length; i++) {
+          formData.append('image', e.dataTransfer.files[i]);
+        }
+      }
+
+      axios.post(`/api/workspaces/${workspace}/channels/${channel}/images`, formData).then(() => {
+        mutate();
+        setDragOver(false);
+        setTimeout(() => {
+          scrollbarRef.current?.scrollToBottom();
+        }, 50);
+      });
+    },
+    [workspace, channel, scrollbarRef.current]
+  );
+
   const chatSections = makeSections(chatData ? [...chatData].flat().reverse() : []);
 
   return (
     <Workspace>
-      <Container>
+      <Container onDragOver={onDragOver} onDrop={onDrop}>
         <Header>
           <span># {channel}</span>
           <div className='header-right'>
@@ -136,6 +171,7 @@ const Channel = () => {
             onCloseModal={onCloseInviteToChannelModal}
           />
         )}
+        {dragOver && <DragOver>Uploading...</DragOver>}
       </Container>
     </Workspace>
   );
