@@ -10,17 +10,14 @@ import Modal from '../Modal';
 import { Label, Input, Button } from '../../pages/SignUp/style';
 
 interface CreateWorkspaceModalProps {
-  showModal: boolean;
   setShowModal: Dispatch<SetStateAction<boolean>>;
   onCloseModal: () => void;
 }
 
-const CreateWorkspaceModal: FC<CreateWorkspaceModalProps> = (props) => {
+const CreateWorkspaceModal: FC<CreateWorkspaceModalProps> = ({ setShowModal, onCloseModal }) => {
   const [newWorkspace, onChangeNewWorkspace, setNewWorkspace] = useInput<string>('');
   const [newUrl, onChangeNewUrl, setNewUrl] = useInput<string>('');
   const { data: userData, mutate } = useSWR<IUser | false>('/api/users', fetcher, { dedupingInterval: 2000 });
-
-  const { showModal, setShowModal, onCloseModal } = props;
 
   const onCreateWorkspace = useCallback(
     async (e) => {
@@ -47,7 +44,7 @@ const CreateWorkspaceModal: FC<CreateWorkspaceModalProps> = (props) => {
   );
 
   return (
-    <Modal showModal={showModal} onCloseModal={onCloseModal}>
+    <Modal onCloseModal={onCloseModal}>
       <form onSubmit={onCreateWorkspace}>
         <Label id='workspace-name'>
           <span>워크스페이스 이름</span>

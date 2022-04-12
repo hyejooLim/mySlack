@@ -11,12 +11,11 @@ import { ParamType, IUser } from '../../types/types';
 import fetcher from '../../utils/fetcher';
 
 interface InviteToWorkspaceModalProps {
-  showModal: boolean;
   setShowModal: Dispatch<SetStateAction<boolean>>;
   onCloseModal: () => void;
 }
 
-const InviteToWorkspaceModal: FC<InviteToWorkspaceModalProps> = (props) => {
+const InviteToWorkspaceModal: FC<InviteToWorkspaceModalProps> = ({ setShowModal, onCloseModal }) => {
   const [memberEmail, onChangeMemberEmail, setMemberEmail] = useInput<string>('');
   const { workspace } = useParams<ParamType>();
 
@@ -25,8 +24,6 @@ const InviteToWorkspaceModal: FC<InviteToWorkspaceModalProps> = (props) => {
     userData ? `/api/workspaces/${workspace}/members` : null,
     fetcher
   );
-
-  const { showModal, setShowModal, onCloseModal } = props;
 
   const onInviteToWorkspace = useCallback(
     async (e) => {
@@ -51,7 +48,7 @@ const InviteToWorkspaceModal: FC<InviteToWorkspaceModalProps> = (props) => {
   );
 
   return (
-    <Modal showModal={showModal} onCloseModal={onCloseModal}>
+    <Modal onCloseModal={onCloseModal}>
       <form onSubmit={onInviteToWorkspace}>
         <Label id='member-email'>
           <span>초대 멤버 이메일</span>

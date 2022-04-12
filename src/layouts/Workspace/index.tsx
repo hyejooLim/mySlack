@@ -26,7 +26,6 @@ import { ParamType, IChannel, IUser, IWorkspace } from '../../types/types';
 import CreateChannelModal from '../../components/CreateChannelModal';
 import CreateWorkspaceModal from '../../components/CreateWorkspaceModal';
 import InviteToWorkspaceModal from '../../components/InviteToWorkspaceModal';
-import InviteToChannelModal from '../../components/InviteToChannelModal';
 import ChannelList from '../../components/ChannelList';
 import DMList from '../../components/DMList';
 import useSocket from '../../hooks/useSocket';
@@ -114,11 +113,7 @@ const Workspace: FC = ({ children }) => {
           <div onClick={onClickUserProfile}>
             <ProfileImg src={gravatar.url(userData.email, { s: '28px', d: 'retro' })} alt={userData.nickname} />
             {showUserProfileModal && (
-              <Menu
-                style={{ right: 0, top: 38 }}
-                showModal={showUserProfileModal}
-                onCloseModal={onCloseUserProfileModal}
-              >
+              <Menu style={{ right: 0, top: 38 }} onCloseModal={onCloseUserProfileModal}>
                 <ProfileModal>
                   <img src={gravatar.url(userData.email, { s: '36px', d: 'retro' })} alt={userData.nickname} />
                   <div>
@@ -144,7 +139,6 @@ const Workspace: FC = ({ children }) => {
           <AddButton onClick={onClickCreateWorkspace}>+</AddButton>
           {showCreateWorkspaceModal && (
             <CreateWorkspaceModal
-              showModal={showCreateWorkspaceModal}
               setShowModal={setShowCreateWorkspaceModal}
               onCloseModal={onCloseCreateWorkspaceModal}
             />
@@ -156,7 +150,7 @@ const Workspace: FC = ({ children }) => {
           </WorkspaceName>
           <MenuScroll>
             {showWorkspaceModal && (
-              <Menu style={{ top: 100, left: 80 }} showModal={showWorkspaceModal} onCloseModal={onToggleWorkspaceModal}>
+              <Menu style={{ top: 100, left: 80 }} onCloseModal={onToggleWorkspaceModal}>
                 <WorkspaceModal>
                   <h2>{userData.Workspaces.find((ws) => ws.url === workspace)?.name}</h2>
                   <button onClick={onClickInviteToWorkspace}>워크스페이스에 사용자 초대하기</button>
@@ -172,15 +166,10 @@ const Workspace: FC = ({ children }) => {
         <Chats>{children}</Chats>
       </WorkspaceWrapper>
       {showCreateChannelModal && (
-        <CreateChannelModal
-          showModal={showCreateChannelModal}
-          setShowModal={setShowCreateChannelModal}
-          onCloseModal={onCloseCreateChannelModal}
-        />
+        <CreateChannelModal setShowModal={setShowCreateChannelModal} onCloseModal={onCloseCreateChannelModal} />
       )}
       {showInviteToWorkspaceModal && (
         <InviteToWorkspaceModal
-          showModal={showInviteToWorkspaceModal}
           setShowModal={setShowInviteToWorkspaceModal}
           onCloseModal={onCloseInviteToWorkspaceModal}
         />

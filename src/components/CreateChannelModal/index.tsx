@@ -11,12 +11,11 @@ import { Label, Input, Button } from '../../pages/SignUp/style';
 import { IUser, ParamType, IChannel } from '../../types/types';
 
 interface CreateChannelModalProps {
-  showModal: boolean;
   setShowModal: Dispatch<SetStateAction<boolean>>;
   onCloseModal: () => void;
 }
 
-const CreateChannelModal: FC<CreateChannelModalProps> = (props) => {
+const CreateChannelModal: FC<CreateChannelModalProps> = ({ setShowModal, onCloseModal }) => {
   const [newChannel, onChangeNewChannel, setNewChannel] = useInput<string>('');
 
   const { workspace, channel } = useParams<ParamType>();
@@ -25,8 +24,6 @@ const CreateChannelModal: FC<CreateChannelModalProps> = (props) => {
     userData ? `/api/workspaces/${workspace}/channels` : null,
     fetcher
   );
-
-  const { showModal, setShowModal, onCloseModal } = props;
 
   const onCreateChannel = useCallback(
     async (e) => {
@@ -49,7 +46,7 @@ const CreateChannelModal: FC<CreateChannelModalProps> = (props) => {
   );
 
   return (
-    <Modal showModal={showModal} onCloseModal={onCloseModal}>
+    <Modal onCloseModal={onCloseModal}>
       <form onSubmit={onCreateChannel}>
         <Label id='channel-name'>
           <span>채널 이름</span>

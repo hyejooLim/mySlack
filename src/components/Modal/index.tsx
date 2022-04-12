@@ -2,7 +2,6 @@ import React, { FC } from 'react';
 import { CloseModalButton, CreateModal } from './style';
 
 interface ModalProps {
-  showModal: boolean;
   onCloseModal: () => void;
 }
 

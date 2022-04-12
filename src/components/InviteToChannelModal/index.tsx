@@ -11,12 +11,11 @@ import { ParamType, IUser } from '../../types/types';
 import fetcher from '../../utils/fetcher';
 
 interface InviteToChannelModalProps {
-  showModal: boolean;
   setShowModal: Dispatch<SetStateAction<boolean>>;
   onCloseModal: () => void;
 }
 
-const InviteToChannelModal: FC<InviteToChannelModalProps> = (props) => {
+const InviteToChannelModal: FC<InviteToChannelModalProps> = ({ setShowModal, onCloseModal }) => {
   const [memberEmail, onChangeMemberEmail, setMemberEmail] = useInput<string>('');
   const { workspace, channel } = useParams<ParamType>();
 
@@ -25,8 +24,6 @@ const InviteToChannelModal: FC<InviteToChannelModalProps> = (props) => {
     userData ? `/api/workspaces/${workspace}/channels/${channel}/members` : null,
     fetcher
   );
-
-  const { showModal, setShowModal, onCloseModal } = props;
 
   const onInviteToChannel = useCallback(
     async (e) => {
@@ -55,7 +52,7 @@ const InviteToChannelModal: FC<InviteToChannelModalProps> = (props) => {
   );
 
   return (
-    <Modal showModal={showModal} onCloseModal={onCloseModal}>
+    <Modal onCloseModal={onCloseModal}>
       <form onSubmit={onInviteToChannel}>
         <Label id='member-email'>
           <span>초대 멤버 이메일</span>

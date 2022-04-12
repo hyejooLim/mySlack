@@ -183,11 +183,7 @@ const Channel = () => {
         <ChatList chatSections={chatSections} ref={scrollbarRef} setSize={setSize} isReachingEnd={isReachingEnd} />
         <ChatBox chat={chat} onChange={onChangeChat} onSubmit={onSubmitChat} placeholder='메시지를 입력하세요.' />
         {showInviteToChannelModal && (
-          <InviteToChannelModal
-            showModal={showInviteToChannelModal}
-            setShowModal={setShowInviteToChannelModal}
-            onCloseModal={onCloseInviteToChannelModal}
-          />
+          <InviteToChannelModal setShowModal={setShowInviteToChannelModal} onCloseModal={onCloseInviteToChannelModal} />
         )}
         {dragOver && <DragOver>Uploading...</DragOver>}
         <ToastContainer />
