@@ -23,7 +23,7 @@ const Channel = () => {
   const [showInviteToChannelModal, setShowInviteToChannelModal] = useState<boolean>(false);
   const [dragOver, setDragOver] = useState<boolean>(false);
 
-  const { workspace, channel, id } = useParams<ParamType>();
+  const { workspace, channel } = useParams<ParamType>();
   const { data: userData } = useSWR<IUser>('/api/users', fetcher, { dedupingInterval: 2000 });
   const { data: channelMemberData } = useSWR<IUser[]>(
     userData ? `/api/workspaces/${workspace}/channels/${channel}/members` : null,
@@ -53,7 +53,7 @@ const Channel = () => {
     (data: IChannelChat) => {
       if (data.Channel.name === channel) {
         localStorage.setItem(`${workspace}-${channel}`, new Date().getTime().toString());
-        
+
         mutate((chatData) => {
           chatData?.[0].unshift(data);
           return chatData;
